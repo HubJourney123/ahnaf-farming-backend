@@ -1,4 +1,4 @@
-// backend/index.js
+// D:\Temp\ahnaf-farming-backend\index.js
 require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
@@ -6,10 +6,13 @@ const cors = require('cors');
 
 // Initialize the Express app
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000; // Use PORT from environment for Render
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://ahnaf-farming-frontend.vercel.app', // Replace with your Vercel frontend URL
+  credentials: true,
+}));
 app.use(express.json());
 
 // Nodemailer Setup with explicit port 587
@@ -68,5 +71,5 @@ ${cartItems}
 
 // Start the Server
 app.listen(port, () => {
-  console.log(`Backend server running on http://localhost:${port}`);
+  console.log(`Backend server running on port ${port}`);
 });
