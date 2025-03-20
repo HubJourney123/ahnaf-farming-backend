@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000; // Use PORT from environment for Render
 
 // Middleware
 app.use(cors({
-  origin: 'https://ahnaf-farming-frontend.vercel.app', // Replace with your Vercel frontend URL
+  origin: 'https://ahnaf-farming.vercel.app', // Replace with your Vercel frontend URL
   credentials: true,
 }));
 app.use(express.json());
