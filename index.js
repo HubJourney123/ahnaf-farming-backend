@@ -31,7 +31,7 @@ const transporter = nodemailer.createTransport({
 // API Endpoint to Handle Order Submission
 app.post('/api/send-order', async (req, res) => {
   console.log('Received request body:', req.body);
-  const { name, phone, detailedLocation, division, district, upazila, transactionId, cart, totalPrice, deliveryCharge, grandTotal } = req.body;
+  const { name, phone, detailedLocation, division, district, upazila, transactionId, yourIdentity, cart, totalPrice, deliveryCharge, grandTotal } = req.body;
 
   const cartItems = cart
     .map((item) => `${item.name} x${item.quantity} = ৳ ${item.price * item.quantity}`)
