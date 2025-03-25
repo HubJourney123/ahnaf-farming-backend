@@ -4,31 +4,34 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
 
-// Initialize the Express app
 const app = express();
-const port = process.env.PORT || 5000; // Use PORT from environment for Render
+const port = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors({
-  origin: 'https://ahnaffarming.vercel.app', // Replace with your Vercel frontend URL
+  origin: 'https://ahnaffarming.vercel.app',
   credentials: true,
 }));
 app.use(express.json());
 
-// Nodemailer Setup with explicit port 587
+// Nodemailer Setup
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
-  secure: false, // Use STARTTLS
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASS, // Use App Password if 2FA is on
   },
-  logger: true, // Enable logging
-  debug: true,  // Enable debug output
+  logger: true,
+  debug: true,
 });
 
-// API Endpoint to Handle Order Submission
+// Verify SMTP connection
+transporter.verify((error, success) => {
+  if (error) console.error('SMTP Verification Error:', error);
+  else console.log('SMTP Server is ready');
+});
+
 app.post('/api/send-order', async (req, res) => {
   console.log('Received request body:', req.body);
   const { name, phone, detailedLocation, division, district, upazila, transactionId, yourIdentity, cart, totalPrice, deliveryCharge, grandTotal } = req.body;
@@ -45,7 +48,7 @@ app.post('/api/send-order', async (req, res) => {
 জেলা: ${district}
 উপজেলা: ${upazila}
 লেনদেন আইডি: ${transactionId}
-Customer পরিচয়: ${yourIdentity}
+Customer পরিচয়: ${yourIdentity || 'Not provided'}
 পণ্যসমূহ:
 ${cartItems}
 সাবটোটাল: ৳ ${totalPrice}
@@ -66,11 +69,10 @@ ${cartItems}
     res.status(200).json({ success: true, message: 'Order sent successfully via email' });
   } catch (error) {
     console.error('Error sending email:', error);
-    res.status(500).json({ success: false, message: 'Failed to send order via email' });
+    res.status(500).json({ success: false, message: 'Failed to send order via email', error: error.message });
   }
 });
 
-// Start the Server
 app.listen(port, () => {
   console.log(`Backend server running on port ${port}`);
 });
