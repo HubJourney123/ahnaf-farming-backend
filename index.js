@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-const { google } = require('googleapis'); // Import googleapis for Sheets API
+const { google } = require('googleapis'); // Import googleapis
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -34,7 +34,7 @@ transporter.verify((error, success) => {
 
 // Google Sheets Setup
 const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS), // Load credentials from env
+  credentials: JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS), // Load
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
