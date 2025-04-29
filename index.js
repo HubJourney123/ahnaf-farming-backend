@@ -94,9 +94,6 @@ ${cartItems}
         transactionId,
         yourIdentity || 'Not provided',
         cartItems,
-        totalPrice,
-        deliveryCharge,
-        grandTotal,
         orderDate,
       ],
     ];
