@@ -43,7 +43,7 @@ const spreadsheetId = process.env.SPREADSHEET_ID;
 
 app.post('/api/send-order', async (req, res) => {
   console.log('Received request body:', req.body);
-  const { name, phone, detailedLocation, district, upazila, transactionId, yourIdentity, cart, totalPrice, deliveryCharge, grandTotal } = req.body;
+  const { name, phone, detailedLocation, district, upazila, transactionId, yourIdentity, cart} = req.body;
 
   const cartItems = cart
     .map((item) => `${item.name} x${item.quantity} = ৳ ${item.price * item.quantity}`)
