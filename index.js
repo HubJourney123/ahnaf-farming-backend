@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-const { google } = require('googleapis'); // Import googleapis
+const { google } = require('googleapis');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Use App Password if 2FA is on
+    pass: process.env.EMAIL_PASS,
   },
   logger: true,
   debug: true,
@@ -34,7 +34,7 @@ transporter.verify((error, success) => {
 
 // Google Sheets Setup
 const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS), // Load
+  credentials: JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS),
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
@@ -43,7 +43,7 @@ const spreadsheetId = process.env.SPREADSHEET_ID;
 
 app.post('/api/send-order', async (req, res) => {
   console.log('Received request body:', req.body);
-  const { name, phone, detailedLocation, district, upazila, transactionId, yourIdentity, cart} = req.body;
+  const { name, phone, detailedLocation, district, upazila, transactionId, yourIdentity, cart, totalPrice, deliveryCharge, grandTotal } = req.body;
 
   const cartItems = cart
     .map((item) => `${item.name} x${item.quantity} = ৳ ${item.price * item.quantity}`)
@@ -81,9 +81,9 @@ ${cartItems}
     console.error('Error sending email:', error.message, error.stack);
   }
 
-  // Step 2: Append to Google Sheet (regardless of email success)
+  // Step 2: Append to Google Sheet (excluding price fields)
   try {
-    const orderDate = new Date().toISOString(); // Current date and time
+    const orderDate = new Date().toISOString();
     const values = [
       [
         name,
@@ -100,7 +100,7 @@ ${cartItems}
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: 'Sheet1!A1', // Adjust if your sheet has a different name
+      range: 'Sheet1!A1',
       valueInputOption: 'RAW',
       resource: {
         values,
@@ -109,7 +109,6 @@ ${cartItems}
     console.log('Order appended to Google Sheet successfully');
   } catch (error) {
     console.error('Error appending to Google Sheet:', error.message, error.stack);
-    // Don’t fail the request if Google Sheet fails; just log the error
   }
 
   // Step 3: Respond to the client
