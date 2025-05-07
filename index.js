@@ -43,7 +43,21 @@ const spreadsheetId = process.env.SPREADSHEET_ID;
 
 app.post('/api/send-order', async (req, res) => {
   console.log('Received request body:', req.body);
-  const { name, phone, detailedLocation, district, upazila, transactionId, yourIdentity, cart, totalPrice, deliveryCharge, grandTotal } = req.body;
+  const { 
+    name, 
+    phone, 
+    detailedLocation, 
+    district, 
+    upazila, 
+    transactionId, 
+    yourIdentity, 
+    cart, 
+    totalPrice, 
+    deliveryCharge, 
+    grandTotal, 
+    paidAmount, 
+    dueAmount 
+  } = req.body;
 
   const cartItems = cart
     .map((item) => `${item.name} x${item.quantity} = ৳ ${item.price * item.quantity}`)
@@ -57,6 +71,8 @@ app.post('/api/send-order', async (req, res) => {
 উপজেলা: ${upazila}
 লেনদেন আইডি: ${transactionId}
 Customer পরিচয়: ${yourIdentity || 'Not provided'}
+পরিশোধিত পরিমাণ: ৳ ${paidAmount}
+বকেয়া পরিমাণ: ৳ ${dueAmount}
 পণ্যসমূহ:
 ${cartItems}
 সাবটোটাল: ৳ ${totalPrice}
@@ -81,20 +97,23 @@ ${cartItems}
     console.error('Error sending email:', error.message, error.stack);
   }
 
-  // Step 2: Append to Google Sheet (excluding price fields)
+  // Step 2: Append to Google Sheet with specified field order
   try {
     const orderDate = new Date().toISOString();
     const values = [
       [
-        name,
-        phone,
-        detailedLocation,
-        district,
-        upazila,
-        transactionId,
-        yourIdentity || 'Not provided',
-        cartItems,
-        orderDate,
+        name,                // Name
+        phone,               // Phone
+        detailedLocation,    // Detailed Location
+        district,            // District
+        upazila,             // Thana (Upazila)
+        cartItems,           // Cart items
+        orderDate,           // Order Date
+        transactionId,       // TnX ID
+        paidAmount,          // Paid Amount
+        dueAmount,           // Due Amount
+        grandTotal,          // Grand Total
+        yourIdentity || 'Not provided', // Your Identity
       ],
     ];
 
