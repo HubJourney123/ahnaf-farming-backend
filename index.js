@@ -59,9 +59,16 @@ app.post('/api/send-order', async (req, res) => {
     dueAmount 
   } = req.body;
 
+  // Format cart items for the "Cart items" column (Bengali names)
   const cartItems = cart
     .map((item) => `${item.name} x${item.quantity} = ৳ ${item.price * item.quantity}`)
     .join('\n');
+
+  // Format English names for a separate column
+  const cartItemsEn = cart
+    .map((item) => `${item.en}`)
+    .join('\n');
+
   const message = `
 অর্ডার বিবরণ:
 নাম: ${name}
@@ -107,7 +114,8 @@ ${cartItems}
         detailedLocation,    // Detailed Location
         district,            // District
         upazila,             // Thana (Upazila)
-        cartItems,           // Cart items
+        cartItems,           // Cart items (Bengali names)
+        cartItemsEn,         // New column for English names
         orderDate,           // Order Date
         transactionId,       // TnX ID
         paidAmount,          // Paid Amount
