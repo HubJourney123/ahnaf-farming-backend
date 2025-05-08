@@ -114,8 +114,8 @@ ${cartItems}
         detailedLocation,    // Detailed Location
         district,            // District
         upazila,             // Thana (Upazila)
+        cartItemsEn,         // Delivery Type
         cartItems,           // Cart items (Bengali names)
-        cartItemsEn,         // New column for English names
         orderDate,           // Order Date
         transactionId,       // TnX ID
         paidAmount,          // Paid Amount
