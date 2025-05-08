@@ -60,7 +60,7 @@ app.post('/api/send-order', async (req, res) => {
   } = req.body;
 
   const cartItems = cart
-    .map((item) => `${item.name} ${item.en || ''} x${item.quantity} = ৳ ${item.price * item.quantity}`)
+    .map((item) => `${item.name} x${item.quantity} = ৳ ${item.price * item.quantity}`)
     .join('\n');
   const message = `
 অর্ডার বিবরণ:
@@ -107,7 +107,7 @@ ${cartItems}
         detailedLocation,    // Detailed Location
         district,            // District
         upazila,             // Thana (Upazila)
-        cartItems,           // Cart items (now includes en field)
+        cartItems,           // Cart items
         orderDate,           // Order Date
         transactionId,       // TnX ID
         paidAmount,          // Paid Amount
