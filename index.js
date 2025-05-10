@@ -61,7 +61,7 @@ app.post('/api/send-order', async (req, res) => {
 
   // Format cart items for the "Cart items" column (Bengali names)
   const cartItems = cart
-    .map((item) => `${item.name} x${item.quantity} = ৳ ${item.price * item.quantity}`)
+    .map((item) => `${item.name} x${item.quantity}`)
     .join('\n');
 
   // Format English names for a separate column
