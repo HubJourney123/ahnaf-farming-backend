@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
 const cors = require('cors');
 const { google } = require('googleapis');
 
@@ -13,24 +13,24 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Nodemailer Setup
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  logger: true,
-  debug: true,
-});
+// Nodemailer Setup (COMMENTED OUT - NOT NEEDED)
+// const transporter = nodemailer.createTransport({
+//   host: 'smtp.gmail.com',
+//   port: 587,
+//   secure: false,
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS,
+//   },
+//   logger: true,
+//   debug: true,
+// });
 
-// Verify SMTP connection
-transporter.verify((error, success) => {
-  if (error) console.error('SMTP Verification Error:', error);
-  else console.log('SMTP Server is ready');
-});
+// Verify SMTP connection (COMMENTED OUT)
+// transporter.verify((error, success) => {
+//   if (error) console.error('SMTP Verification Error:', error);
+//   else console.log('SMTP Server is ready');
+// });
 
 // Google Sheets Setup
 const auth = new google.auth.GoogleAuth({
@@ -79,7 +79,7 @@ app.post('/api/send-order', async (req, res) => {
 লেনদেন আইডি: ${transactionId}
 Customer পরিচয়: ${yourIdentity || 'Not provided'}
 পরিশোধিত পরিমাণ: ৳ ${paidAmount}
-বকেয়া পরিমাণ: ৳ ${dueAmount}
+বকেয়�� পরিমাণ: ৳ ${dueAmount}
 পণ্যসমূহ:
 ${cartItems}
 সাবটোটাল: ৳ ${totalPrice}
@@ -87,24 +87,26 @@ ${cartItems}
 মোট: ৳ ${grandTotal}
   `.trim();
 
-  let emailSent = false;
+  // Email sending DISABLED - orders will be saved to Google Sheets only
+  // let emailSent = false;
 
-  // Step 1: Send Email
-  try {
-    console.log('Sending email to:', 'ahnaffarming@gmail.com');
-    await transporter.sendMail({
-      from: `"Ahnaf Farming" <${process.env.EMAIL_USER}>`,
-      to: 'ahnaffarming@gmail.com',
-      subject: `New Order from ${name}`,
-      text: message,
-    });
-    console.log('Email sent successfully');
-    emailSent = true;
-  } catch (error) {
-    console.error('Error sending email:', error.message, error.stack);
-  }
+  // Step 1: Send Email (COMMENTED OUT - DISABLED DUE TO RENDER FREE TIER LIMITATIONS)
+  // try {
+  //   console.log('Sending email to:', 'ahnaffarming@gmail.com');
+  //   await transporter.sendMail({
+  //     from: `"Ahnaf Farming" <${process.env.EMAIL_USER}>`,
+  //     to: 'ahnaffarming@gmail.com',
+  //     subject: `New Order from ${name}`,
+  //     text: message,
+  //   });
+  //   console.log('Email sent successfully');
+  //   emailSent = true;
+  // } catch (error) {
+  //   console.error('Error sending email:', error.message, error.stack);
+  // }
 
   // Step 2: Append to Google Sheet with specified field order
+  let sheetSaved = false;
   try {
     const orderDate = new Date().toISOString();
     const values = [
@@ -134,15 +136,16 @@ ${cartItems}
       },
     });
     console.log('Order appended to Google Sheet successfully');
+    sheetSaved = true;
   } catch (error) {
     console.error('Error appending to Google Sheet:', error.message, error.stack);
   }
 
   // Step 3: Respond to the client
-  if (emailSent) {
-    res.status(200).json({ success: true, message: 'Order sent successfully via email' });
+  if (sheetSaved) {
+    res.status(200).json({ success: true, message: 'Order received and saved to records' });
   } else {
-    res.status(500).json({ success: false, message: 'Failed to send order via email, but order data saved to sheet' });
+    res.status(500).json({ success: false, message: 'Failed to save order to records' });
   }
 });
 
